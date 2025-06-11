@@ -98,22 +98,22 @@ function AlertsPanel({ alerts, onAlertRead }: AlertsPanelProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Security Alerts</h2>
           <p className="text-sm text-muted-foreground">
             {unreadCount} unread alert{unreadCount !== 1 ? 's' : ''} of {alerts.length} total
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           {unreadCount > 0 && (
-            <Button variant="outline" onClick={handleMarkAllAsRead}>
+            <Button variant="outline" onClick={handleMarkAllAsRead} className="w-full sm:w-auto">
               <CheckCircle className="h-4 w-4 mr-2" />
               Mark All Read
             </Button>
           )}
-          <Button variant="outline">
+          <Button variant="outline" className="w-full sm:w-auto">
             <Bell className="h-4 w-4 mr-2" />
             Settings
           </Button>
@@ -121,25 +121,27 @@ function AlertsPanel({ alerts, onAlertRead }: AlertsPanelProps) {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex space-x-2 border-b">
-        {[
-          { key: 'all', label: `All (${alerts.length})` },
-          { key: 'unread', label: `Unread (${unreadCount})` },
-          { key: 'motion', label: `Motion (${alerts.filter(a => a.type === 'motion').length})` },
-          { key: 'offline', label: `Offline (${alerts.filter(a => a.type === 'offline').length})` }
-        ].map(tab => (
-          <button
-            key={tab.key}
-            className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
-              filter === tab.key
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setFilter(tab.key as typeof filter)}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="overflow-x-auto">
+        <div className="flex space-x-2 border-b min-w-max">
+          {[
+            { key: 'all', label: `All (${alerts.length})` },
+            { key: 'unread', label: `Unread (${unreadCount})` },
+            { key: 'motion', label: `Motion (${alerts.filter(a => a.type === 'motion').length})` },
+            { key: 'offline', label: `Offline (${alerts.filter(a => a.type === 'offline').length})` }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                filter === tab.key
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setFilter(tab.key as typeof filter)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Alerts List */}

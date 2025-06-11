@@ -134,20 +134,22 @@ export default function CCTVMonitor() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
+        <div className="px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Camera className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">CCTV Monitor</h1>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Camera className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">CCTV Monitor</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant={stats.unreadAlerts > 0 ? "destructive" : "secondary"}>
-                <AlertTriangle className="h-4 w-4 mr-1" />
-                {stats.unreadAlerts} Alerts
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Badge variant={stats.unreadAlerts > 0 ? "destructive" : "secondary"} className="text-xs">
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">{stats.unreadAlerts} Alerts</span>
+                <span className="sm:hidden">{stats.unreadAlerts}</span>
               </Badge>
-              <Badge variant="outline">
-                <Wifi className="h-4 w-4 mr-1" />
-                {stats.onlineCameras}/{stats.totalCameras} Online
+              <Badge variant="outline" className="text-xs">
+                <Wifi className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">{stats.onlineCameras}/{stats.totalCameras} Online</span>
+                <span className="sm:hidden">{stats.onlineCameras}/{stats.totalCameras}</span>
               </Badge>
             </div>
           </div>
@@ -155,83 +157,89 @@ export default function CCTVMonitor() {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
-              <Eye className="h-4 w-4" />
-              <span>Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="cameras" className="flex items-center space-x-2">
-              <Camera className="h-4 w-4" />
-              <span>Cameras</span>
-            </TabsTrigger>
-            <TabsTrigger value="recordings" className="flex items-center space-x-2">
-              <PlayCircle className="h-4 w-4" />
-              <span>Recordings</span>
-            </TabsTrigger>
-            <TabsTrigger value="alerts" className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4" />
-              <span>Alerts</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center space-x-2">
-              <Settings className="h-4 w-4" />
-              <span>Settings</span>
-            </TabsTrigger>
-          </TabsList>
+      <main className="px-4 sm:px-6 py-4 sm:py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-5 min-w-max sm:min-w-0">
+              <TabsTrigger value="dashboard" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="cameras" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Cameras</span>
+              </TabsTrigger>
+              <TabsTrigger value="recordings" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Records</span>
+              </TabsTrigger>
+              <TabsTrigger value="alerts" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Alerts</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Settings</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Dashboard Tab */}
-          <TabsContent value="dashboard" className="space-y-6">
+          <TabsContent value="dashboard" className="space-y-4 sm:space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Cameras</CardTitle>
-                  <Camera className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">Total Cameras</CardTitle>
+                  <Camera className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalCameras}</div>
+                  <div className="text-lg sm:text-2xl font-bold">{stats.totalCameras}</div>
                   <p className="text-xs text-muted-foreground">
-                    {stats.onlineCameras} online, {stats.offlineCameras} offline
+                    <span className="hidden sm:inline">{stats.onlineCameras} online, {stats.offlineCameras} offline</span>
+                    <span className="sm:hidden">{stats.onlineCameras} / {stats.offlineCameras}</span>
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Recordings</CardTitle>
-                  <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">Recordings</CardTitle>
+                  <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalRecordings}</div>
+                  <div className="text-lg sm:text-2xl font-bold">{stats.totalRecordings}</div>
                   <p className="text-xs text-muted-foreground">
-                    Available recordings
+                    <span className="hidden sm:inline">Available recordings</span>
+                    <span className="sm:hidden">Available</span>
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Storage Used</CardTitle>
-                  <HardDrive className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">Storage</CardTitle>
+                  <HardDrive className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.storageUsed}GB</div>
+                  <div className="text-lg sm:text-2xl font-bold">{stats.storageUsed}GB</div>
                   <p className="text-xs text-muted-foreground">
-                    of {stats.storageTotal}GB total
+                    <span className="hidden sm:inline">of {stats.storageTotal}GB total</span>
+                    <span className="sm:hidden">/ {stats.storageTotal}GB</span>
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
-                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">Alerts</CardTitle>
+                  <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.unreadAlerts}</div>
+                  <div className="text-lg sm:text-2xl font-bold">{stats.unreadAlerts}</div>
                   <p className="text-xs text-muted-foreground">
-                    Unread notifications
+                    <span className="hidden sm:inline">Unread notifications</span>
+                    <span className="sm:hidden">Unread</span>
                   </p>
                 </CardContent>
               </Card>

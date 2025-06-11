@@ -114,21 +114,21 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Camera Management</h2>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Camera
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Camera</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <Label htmlFor="name">Camera Name</Label>
                   <Input
@@ -165,7 +165,7 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Resolution</Label>
                   <Select onValueChange={(value) => setValue('resolution', value as '720p' | '1080p' | '4K')}>
@@ -227,91 +227,97 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
         {cameras.map((camera) => (
           <Card key={camera.id}>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <CameraIcon className="h-5 w-5" />
-                  <div>
-                    <CardTitle className="text-base">{camera.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{camera.location}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <CameraIcon className="h-5 w-5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base truncate">{camera.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground truncate">{camera.location}</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                   {camera.isOnline ? (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
+                    <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
                       <Wifi className="h-3 w-3 mr-1" />
-                      Online
+                      <span className="hidden sm:inline">Online</span>
                     </Badge>
                   ) : (
-                    <Badge variant="destructive">
+                    <Badge variant="destructive" className="text-xs">
                       <WifiOff className="h-3 w-3 mr-1" />
-                      Offline
+                      <span className="hidden sm:inline">Offline</span>
                     </Badge>
                   )}
-                  <Badge variant="secondary">{camera.resolution}</Badge>
-                  <Badge variant="outline">{camera.type}</Badge>
+                  <Badge variant="secondary" className="text-xs">{camera.resolution}</Badge>
+                  <Badge variant="outline" className="text-xs">{camera.type}</Badge>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Stream Information</h4>
-                  <p className="text-xs text-muted-foreground break-all">{camera.streamUrl}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Added: {formatDistanceToNow(camera.createdAt, { addSuffix: true })}
-                  </p>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Status</h4>
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span>Recording:</span>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Stream Information</h4>
+                    <p className="text-xs text-muted-foreground break-all">{camera.streamUrl}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Added: {formatDistanceToNow(camera.createdAt, { addSuffix: true })}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Status</h4>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span>Recording:</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-2"
+                          onClick={() => toggleRecording(camera)}
+                        >
+                          {camera.recordingEnabled ? (
+                            <>
+                              <Eye className="h-3 w-3 mr-1 text-green-600" />
+                              <span className="text-green-600">On</span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="h-3 w-3 mr-1 text-gray-400" />
+                              <span className="text-gray-400">Off</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      {camera.lastMotionDetected && (
+                        <p className="text-xs text-muted-foreground">
+                          Last motion: {formatDistanceToNow(camera.lastMotionDetected, { addSuffix: true })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="sm:col-span-2 lg:col-span-1">
+                    <h4 className="text-sm font-medium mb-2">Actions</h4>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         size="sm"
-                        variant="ghost"
-                        className="h-6 px-2"
-                        onClick={() => toggleRecording(camera)}
+                        variant="outline"
+                        onClick={() => handleEdit(camera)}
+                        className="flex-1 sm:flex-none"
                       >
-                        {camera.recordingEnabled ? (
-                          <>
-                            <Eye className="h-3 w-3 mr-1 text-green-600" />
-                            <span className="text-green-600">On</span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="h-3 w-3 mr-1 text-gray-400" />
-                            <span className="text-gray-400">Off</span>
-                          </>
-                        )}
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 flex-1 sm:flex-none"
+                        onClick={() => handleDelete(camera.id)}
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
                       </Button>
                     </div>
-                    {camera.lastMotionDetected && (
-                      <p className="text-xs text-muted-foreground">
-                        Last motion: {formatDistanceToNow(camera.lastMotionDetected, { addSuffix: true })}
-                      </p>
-                    )}
                   </div>
-                </div>
-                
-                <div className="flex items-center justify-end space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(camera)}
-                  >
-                    <Edit className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 hover:text-red-700"
-                    onClick={() => handleDelete(camera.id)}
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Delete
-                  </Button>
                 </div>
               </div>
             </CardContent>

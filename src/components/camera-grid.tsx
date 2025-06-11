@@ -37,41 +37,41 @@ function CameraGrid({ cameras }: CameraGridProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Live Camera Feeds</h2>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">
           <RotateCcw className="h-4 w-4 mr-2" />
           Refresh All
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
         {cameras.map((camera) => (
           <Card key={camera.id} className="overflow-hidden">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium flex items-center space-x-2">
-                  <CameraIcon className="h-4 w-4" />
-                  <span>{camera.name}</span>
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-sm font-medium flex items-center space-x-2 min-w-0 flex-1">
+                  <CameraIcon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{camera.name}</span>
                 </CardTitle>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 flex-shrink-0">
                   {camera.isOnline ? (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
+                    <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
                       <Wifi className="h-3 w-3 mr-1" />
-                      Online
+                      <span className="hidden sm:inline">Online</span>
                     </Badge>
                   ) : (
-                    <Badge variant="destructive">
+                    <Badge variant="destructive" className="text-xs">
                       <WifiOff className="h-3 w-3 mr-1" />
-                      Offline
+                      <span className="hidden sm:inline">Offline</span>
                     </Badge>
                   )}
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="text-xs">
                     {camera.resolution}
                   </Badge>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">{camera.location}</p>
+              <p className="text-xs text-muted-foreground truncate">{camera.location}</p>
             </CardHeader>
             
             <CardContent className="space-y-3">
@@ -113,22 +113,24 @@ function CameraGrid({ cameras }: CameraGridProps) {
               </div>
 
               {/* Camera Controls */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex space-x-2">
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => handlePlayStream(camera)}
                     disabled={!camera.isOnline}
+                    className="flex-1 sm:flex-none"
                   >
                     <Play className="h-3 w-3 mr-1" />
-                    Play
+                    <span className="hidden sm:inline">Play</span>
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => handleFullscreen(camera)}
                     disabled={!camera.isOnline}
+                    className="px-2"
                   >
                     <Maximize className="h-3 w-3" />
                   </Button>
@@ -136,14 +138,15 @@ function CameraGrid({ cameras }: CameraGridProps) {
                     size="sm" 
                     variant="outline"
                     onClick={() => handleRefresh(camera)}
+                    className="px-2"
                   >
                     <RotateCcw className="h-3 w-3" />
                   </Button>
                 </div>
                 
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground sm:text-right">
                   {camera.lastMotionDetected && (
-                    <span>
+                    <span className="block sm:inline">
                       Motion: {formatDistanceToNow(camera.lastMotionDetected, { addSuffix: true })}
                     </span>
                   )}
@@ -154,7 +157,9 @@ function CameraGrid({ cameras }: CameraGridProps) {
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Type: {camera.type}</span>
                 <span>
-                  Recording: {camera.recordingEnabled ? 'On' : 'Off'}
+                  Recording: <span className={camera.recordingEnabled ? 'text-green-600' : 'text-gray-500'}>
+                    {camera.recordingEnabled ? 'On' : 'Off'}
+                  </span>
                 </span>
               </div>
             </CardContent>

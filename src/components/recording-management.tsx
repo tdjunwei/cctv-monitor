@@ -156,15 +156,15 @@ function RecordingManagement({ cameras }: RecordingManagementProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Recording Management</h2>
           <p className="text-sm text-muted-foreground">
             {filteredRecordings.length} recordings • {getTotalSize().toFixed(1)} MB total
           </p>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" className="w-full sm:w-auto">
           <HardDrive className="h-4 w-4 mr-2" />
           Storage Settings
         </Button>
@@ -179,8 +179,8 @@ function RecordingManagement({ cameras }: RecordingManagementProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="sm:col-span-2 lg:col-span-1">
               <Input
                 placeholder="Search recordings..."
                 value={searchTerm}
