@@ -11,7 +11,8 @@ import {
   PlayCircle,
   Eye,
   Wifi,
-  HardDrive
+  HardDrive,
+  Activity
 } from 'lucide-react';
 import { Camera as CameraType, Alert, DashboardStats } from '@/types/cctv';
 import { CameraGrid } from '@/components/camera-grid';
@@ -19,6 +20,7 @@ import { CameraManagement } from '@/components/camera-management';
 import { RecordingManagement } from '@/components/recording-management';
 import { AlertsPanel } from '@/components/alerts-panel';
 import { SettingsPanel } from '@/components/settings-panel';
+import { StreamManager } from '@/components/ui/stream-manager';
 import { DatabaseAPI } from '@/lib/database-client';
 
 // Mock data for demonstration  
@@ -262,7 +264,7 @@ export default function CCTVMonitor() {
       <main className="px-4 sm:px-6 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <div className="overflow-x-auto">
-            <TabsList className="grid w-full grid-cols-5 min-w-max sm:min-w-0">
+            <TabsList className="grid w-full grid-cols-6 min-w-max sm:min-w-0">
               <TabsTrigger value="dashboard" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
                 <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-xs sm:text-sm">Dashboard</span>
@@ -270,6 +272,10 @@ export default function CCTVMonitor() {
               <TabsTrigger value="cameras" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
                 <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-xs sm:text-sm">Cameras</span>
+              </TabsTrigger>
+              <TabsTrigger value="streaming" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
+                <Activity className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">Streaming</span>
               </TabsTrigger>
               <TabsTrigger value="recordings" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3">
                 <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -358,6 +364,11 @@ export default function CCTVMonitor() {
               onCameraUpdate={handleCameraUpdate}
               onCameraDelete={handleCameraDelete}
             />
+          </TabsContent>
+
+          {/* Streaming Tab */}
+          <TabsContent value="streaming">
+            <StreamManager cameras={cameras} />
           </TabsContent>
 
           {/* Recordings Tab */}
