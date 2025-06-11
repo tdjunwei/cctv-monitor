@@ -20,6 +20,9 @@ import { RecordingManagement } from '@/components/recording-management';
 import { AlertsPanel } from '@/components/alerts-panel';
 import { SettingsPanel } from '@/components/settings-panel';
 import { DatabaseAPI } from '@/lib/database-client';
+import { 
+  calculateDashboardStats
+} from '@/lib/utils/cctv-utils';
 
 // Mock data for demonstration  
 const mockCameras: CameraType[] = [
@@ -136,24 +139,9 @@ export default function CCTVMonitor() {
       setCameras(camerasData);
       setAlerts(alertsData);
       
-      // Calculate stats from real data
-      const onlineCameras = camerasData.filter(cam => cam.isOnline).length;
-      const offlineCameras = camerasData.length - onlineCameras;
-      const unreadAlerts = alertsData.filter(alert => !alert.isRead).length;
-      const lastMotionDetected = camerasData
-        .filter(cam => cam.lastMotionDetected)
-        .sort((a, b) => (b.lastMotionDetected?.getTime() || 0) - (a.lastMotionDetected?.getTime() || 0))[0]?.lastMotionDetected;
-      
-      setStats({
-        totalCameras: camerasData.length,
-        onlineCameras,
-        offlineCameras,
-        totalRecordings: 156, // TODO: Load from recordings API
-        storageUsed: 45.2, // TODO: Load from dashboard API
-        storageTotal: 500, // TODO: Load from dashboard API
-        unreadAlerts,
-        lastMotionDetected: lastMotionDetected || new Date()
-      });
+      // Calculate stats from real data using utility function
+      const stats = calculateDashboardStats(camerasData, [], alertsData);
+      setStats(stats);
       
     } catch (err) {
       console.error('Error loading data:', err);
@@ -225,7 +213,7 @@ export default function CCTVMonitor() {
             </div>
             <button
               onClick={() => setError(null)}
-              className="text-red-600 hover:text-red-800"
+              className="text-red-600 hover:text-red-800 cursor-pointer"
             >
               ×
             </button>

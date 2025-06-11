@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, Bell } from 'lucide-react';
+import { CheckCircle, Clock, Eye, Bell } from 'lucide-react';
 import { Alert as AlertType } from '@/types/cctv';
 import { formatTimeAgo, formatDateTime } from '@/lib/utils/cctv-utils';
 import { SeverityBadge, AlertTypeIcon } from '@/components/ui/status-badges';
