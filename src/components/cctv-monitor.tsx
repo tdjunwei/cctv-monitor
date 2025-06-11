@@ -20,9 +20,6 @@ import { RecordingManagement } from '@/components/recording-management';
 import { AlertsPanel } from '@/components/alerts-panel';
 import { SettingsPanel } from '@/components/settings-panel';
 import { DatabaseAPI } from '@/lib/database-client';
-import { 
-  calculateDashboardStats
-} from '@/lib/utils/cctv-utils';
 
 // Mock data for demonstration  
 const mockCameras: CameraType[] = [
@@ -134,18 +131,16 @@ export default function CCTVMonitor() {
       setLoading(true);
       setError(null);
       
-      // Load cameras and alerts from API
-      const [camerasData, alertsData] = await Promise.all([
+      // Load cameras, alerts, and dashboard stats from API
+      const [camerasData, alertsData, statsData] = await Promise.all([
         DatabaseAPI.getCameras(),
-        DatabaseAPI.getAlerts()
+        DatabaseAPI.getAlerts(),
+        DatabaseAPI.getDashboardStats()
       ]);
       
       setCameras(camerasData);
       setAlerts(alertsData);
-      
-      // Calculate stats from real data using utility function
-      const stats = calculateDashboardStats(camerasData, [], alertsData);
-      setStats(stats);
+      setStats(statsData);
       
     } catch (err) {
       console.error('Error loading data:', err);
@@ -153,6 +148,7 @@ export default function CCTVMonitor() {
       // Fallback to mock data if API fails
       setCameras(mockCameras);
       setAlerts(mockAlerts);
+      setStats(mockStats);
     } finally {
       setLoading(false);
     }

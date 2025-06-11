@@ -1,4 +1,4 @@
-import { Camera, Recording, Alert, ONVIFDiscoveryResult, ONVIFCapabilities, ONVIFProfile } from '@/types/cctv';
+import { Camera, Recording, Alert, ONVIFDiscoveryResult, ONVIFCapabilities, ONVIFProfile, DashboardStats } from '@/types/cctv';
 
 // Client-side database API functions
 export class DatabaseAPI {
@@ -262,6 +262,19 @@ export class DatabaseAPI {
     
     const result = await response.json();
     return result.success;
+  }
+
+  // Dashboard statistics
+  static async getDashboardStats(): Promise<DashboardStats> {
+    const response = await this.apiRequest(`${this.BASE_URL}/dashboard/stats`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch dashboard statistics');
+    }
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error('Failed to fetch dashboard statistics');
+    }
+    return result.data;
   }
 
   // Utility methods for error handling
