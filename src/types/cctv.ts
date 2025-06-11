@@ -8,6 +8,14 @@ export interface Camera {
   recordingEnabled: boolean;
   resolution: string;
   type: 'indoor' | 'outdoor';
+  // ONVIF Support
+  onvifEnabled: boolean;
+  onvifHost?: string;
+  onvifPort?: number;
+  onvifUsername?: string;
+  onvifPassword?: string;
+  onvifProfileToken?: string;
+  onvifCapabilities?: unknown;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,4 +65,42 @@ export interface DashboardStats {
   storageTotal: number; // in GB
   unreadAlerts: number;
   lastMotionDetected?: Date;
+}
+
+// ONVIF-specific types
+export interface ONVIFDevice {
+  urn: string;
+  name?: string;
+  host: string;
+  port: number;
+  xaddrs: string[];
+  scopes?: string[];
+  types?: string[];
+}
+
+export interface ONVIFProfile {
+  token: string;
+  name: string;
+  videoSourceConfiguration: unknown;
+  videoEncoderConfiguration: unknown;
+  ptzConfiguration?: unknown;
+}
+
+export interface ONVIFCapabilities {
+  device?: unknown;
+  media?: unknown;
+  ptz?: unknown;
+  imaging?: unknown;
+  analytics?: unknown;
+  events?: unknown;
+}
+
+export interface ONVIFCredentials {
+  username: string;
+  password: string;
+}
+
+export interface ONVIFDiscoveryResult {
+  devices: ONVIFDevice[];
+  error?: string;
 }

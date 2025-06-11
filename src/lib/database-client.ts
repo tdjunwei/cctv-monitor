@@ -1,4 +1,4 @@
-import { Camera, Recording, Alert } from '@/types/cctv';
+import { Camera, Recording, Alert, ONVIFDiscoveryResult, ONVIFCapabilities, ONVIFProfile } from '@/types/cctv';
 
 // Client-side database API functions
 export class DatabaseAPI {
@@ -189,6 +189,81 @@ export class DatabaseAPI {
     return result.data;
   }
 
+  // ONVIF operations
+  static async discoverONVIFDevices(timeout?: number): Promise<ONVIFDiscoveryResult> {
+    const response = await this.apiRequest(`${this.BASE_URL}/cameras/onvif/discover${timeout ? `?timeout=${timeout}` : ''}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to discover ONVIF devices');
+    }
+    
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to discover ONVIF devices');
+    }
+    
+    return result.data;
+  }
+
+  static async testONVIFConnection(credentials: {
+    host: string;
+    port?: number;
+    username: string;
+    password: string;
+  }): Promise<{
+    success: boolean;
+    capabilities?: ONVIFCapabilities;
+    profiles?: ONVIFProfile[];
+    streamUri?: string;
+    error?: string;
+  }> {
+    const response = await this.apiRequest(`${this.BASE_URL}/cameras/onvif/test`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+    
+    const result = await response.json();
+    return result.data || result;
+  }
+
+  static async getONVIFCapabilities(cameraId: string): Promise<{
+    capabilities: ONVIFCapabilities;
+    profiles: ONVIFProfile[];
+  }> {
+    const response = await this.apiRequest(`${this.BASE_URL}/cameras/${cameraId}/onvif/capabilities`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to get ONVIF capabilities');
+    }
+    
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to get ONVIF capabilities');
+    }
+    
+    return result.data;
+  }
+
+  static async controlPTZ(cameraId: string, action: 'move' | 'stop', direction?: string, speed?: number): Promise<boolean> {
+    const response = await this.apiRequest(`${this.BASE_URL}/cameras/${cameraId}/onvif/ptz`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action, direction, speed }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to control PTZ');
+    }
+    
+    const result = await response.json();
+    return result.success;
+  }
+
   // Utility methods for error handling
   static handleError(error: unknown): string {
     if (error instanceof Error) {
@@ -209,6 +284,7 @@ export class DatabaseAPI {
         recordingEnabled: true,
         resolution: '1080p',
         type: 'outdoor',
+        onvifEnabled: false,
         createdAt: new Date(),
         updatedAt: new Date(),
         lastMotionDetected: new Date(Date.now() - 2 * 60 * 60 * 1000)
@@ -222,6 +298,7 @@ export class DatabaseAPI {
         recordingEnabled: true,
         resolution: '720p',
         type: 'indoor',
+        onvifEnabled: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -234,6 +311,7 @@ export class DatabaseAPI {
         recordingEnabled: true,
         resolution: '4K',
         type: 'outdoor',
+        onvifEnabled: false,
         createdAt: new Date(),
         updatedAt: new Date(),
         lastMotionDetected: new Date(Date.now() - 30 * 60 * 1000)

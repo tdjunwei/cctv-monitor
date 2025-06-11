@@ -35,6 +35,7 @@ const mockCameras: CameraType[] = [
     recordingEnabled: true,
     resolution: '1080p',
     type: 'outdoor',
+    onvifEnabled: false,
     lastMotionDetected: new Date('2024-06-11T12:00:00Z'),
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-06-11T10:00:00Z')
@@ -48,6 +49,7 @@ const mockCameras: CameraType[] = [
     recordingEnabled: true,
     resolution: '1080p',
     type: 'indoor',
+    onvifEnabled: false,
     createdAt: new Date('2024-01-20'),
     updatedAt: new Date('2024-06-11T10:00:00Z')
   },
@@ -60,6 +62,7 @@ const mockCameras: CameraType[] = [
     recordingEnabled: true,
     resolution: '720p',
     type: 'outdoor',
+    onvifEnabled: false,
     lastMotionDetected: new Date('2024-06-11T11:30:00Z'),
     createdAt: new Date('2024-01-25'),
     updatedAt: new Date('2024-06-11T10:00:00Z')
@@ -73,6 +76,7 @@ const mockCameras: CameraType[] = [
     recordingEnabled: false,
     resolution: '1080p',
     type: 'indoor',
+    onvifEnabled: false,
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-06-11T10:00:00Z')
   }

@@ -18,7 +18,14 @@ const cameraSchema = z.object({
   streamUrl: z.string().url('Invalid stream URL'),
   resolution: z.enum(['720p', '1080p', '4K']),
   type: z.enum(['indoor', 'outdoor']),
-  recordingEnabled: z.boolean()
+  recordingEnabled: z.boolean(),
+  onvifEnabled: z.boolean().optional(),
+  onvifHost: z.string().optional(),
+  onvifPort: z.number().optional(),
+  onvifUsername: z.string().optional(),
+  onvifPassword: z.string().optional(),
+  onvifProfileToken: z.string().optional(),
+  onvifCapabilities: z.string().optional()
 });
 
 type CameraFormData = z.infer<typeof cameraSchema>;
@@ -64,7 +71,14 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
         // Create new camera
         const newCamera: Omit<Camera, 'id' | 'createdAt' | 'updatedAt'> = {
           ...data,
-          isOnline: false
+          isOnline: false,
+          onvifEnabled: data.onvifEnabled || false,
+          onvifHost: data.onvifHost,
+          onvifPort: data.onvifPort,
+          onvifUsername: data.onvifUsername,
+          onvifPassword: data.onvifPassword,
+          onvifProfileToken: data.onvifProfileToken,
+          onvifCapabilities: data.onvifCapabilities
         };
         const createdCamera = await DatabaseAPI.createCamera(newCamera);
         onCameraUpdate(createdCamera);

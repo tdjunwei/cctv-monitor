@@ -11,6 +11,7 @@ import { Camera } from '@/types/cctv';
 import { DatabaseAPI } from '@/lib/database-client';
 import { CameraCard } from '@/components/ui/camera-card';
 import { InputField, SelectField, CheckboxField } from '@/components/ui/form-fields';
+import { ONVIFConfiguration } from '@/components/ui/onvif-configuration';
 
 const cameraSchema = z.object({
   name: z.string().min(1, 'Camera name is required'),
@@ -18,7 +19,13 @@ const cameraSchema = z.object({
   streamUrl: z.string().url('Invalid stream URL'),
   resolution: z.enum(['720p', '1080p', '4K']),
   type: z.enum(['indoor', 'outdoor']),
-  recordingEnabled: z.boolean()
+  recordingEnabled: z.boolean(),
+  // ONVIF Support
+  onvifEnabled: z.boolean(),
+  onvifHost: z.string().optional(),
+  onvifPort: z.number().min(1).max(65535).optional(),
+  onvifUsername: z.string().optional(),
+  onvifPassword: z.string().optional()
 });
 
 type CameraFormData = z.infer<typeof cameraSchema>;
@@ -39,13 +46,18 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors }
   } = useForm<CameraFormData>({
     resolver: zodResolver(cameraSchema),
     defaultValues: {
-      recordingEnabled: true
+      recordingEnabled: true,
+      onvifEnabled: false,
+      onvifPort: 80
     }
   });
+
+  const watchedValues = watch();
 
   const onSubmit = async (data: CameraFormData) => {
     setIsSubmitting(true);
@@ -87,6 +99,12 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
     setValue('resolution', camera.resolution as '720p' | '1080p' | '4K');
     setValue('type', camera.type);
     setValue('recordingEnabled', camera.recordingEnabled);
+    // ONVIF fields
+    setValue('onvifEnabled', camera.onvifEnabled);
+    setValue('onvifHost', camera.onvifHost || '');
+    setValue('onvifPort', camera.onvifPort || 80);
+    setValue('onvifUsername', camera.onvifUsername || '');
+    setValue('onvifPassword', camera.onvifPassword || '');
   };
 
   const handleDelete = (cameraId: string) => {
@@ -190,7 +208,23 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
                 register={register('recordingEnabled')}
               />
 
-              <div className="flex justify-end space-x-2 pt-4">
+              {/* ONVIF Configuration */}
+              <ONVIFConfiguration
+                onvifEnabled={watchedValues.onvifEnabled}
+                onvifHost={watchedValues.onvifHost}
+                onvifPort={watchedValues.onvifPort}
+                onvifUsername={watchedValues.onvifUsername}
+                onvifPassword={watchedValues.onvifPassword}
+                onConfigChange={(config) => {
+                  Object.entries(config).forEach(([key, value]) => {
+                    if (value !== undefined) {
+                      setValue(key as keyof CameraFormData, value);
+                    }
+                  });
+                }}
+              />
+
+              <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="cursor-pointer">
                   Cancel
                 </Button>
@@ -294,7 +328,23 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
                 register={register('recordingEnabled')}
               />
 
-              <div className="flex justify-end space-x-2 pt-4">
+              {/* ONVIF Configuration for Edit */}
+              <ONVIFConfiguration
+                onvifEnabled={watchedValues.onvifEnabled}
+                onvifHost={watchedValues.onvifHost}
+                onvifPort={watchedValues.onvifPort}
+                onvifUsername={watchedValues.onvifUsername}
+                onvifPassword={watchedValues.onvifPassword}
+                onConfigChange={(config) => {
+                  Object.entries(config).forEach(([key, value]) => {
+                    if (value !== undefined) {
+                      setValue(key as keyof CameraFormData, value);
+                    }
+                  });
+                }}
+              />
+
+              <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setEditingCamera(null)} className="cursor-pointer">
                   Cancel
                 </Button>

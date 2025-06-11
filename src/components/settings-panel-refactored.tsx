@@ -6,16 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   Settings,
   Save,
   HardDrive,
   Bell,
   Camera,
   Shield,
-  Mail,
-  Moon,
-  Volume2,
   Wifi
 } from 'lucide-react';
 import { SystemSettings } from '@/types/cctv';
@@ -55,7 +52,6 @@ function SettingsPanel({ initialSettings = defaultSettings, onSettingsUpdate }: 
   const [activeTab, setActiveTab] = useState<'recording' | 'storage' | 'motion' | 'notifications' | 'network'>('recording');
 
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
@@ -192,7 +188,7 @@ function SettingsPanel({ initialSettings = defaultSettings, onSettingsUpdate }: 
                     id="recordingQuality"
                     options={qualityOptions}
                     value={watchedValues.recordingQuality}
-                    onValueChange={(value) => setValue('recordingQuality', value as any)}
+                    onValueChange={(value) => setValue('recordingQuality', value as 'low' | 'medium' | 'high' | 'ultra')}
                     error={errors.recordingQuality}
                   />
 

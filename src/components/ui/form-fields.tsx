@@ -40,6 +40,11 @@ interface InputFieldProps {
   error?: FieldError;
   register?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   className?: string;
+  // Controlled input props
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  min?: string;
+  max?: string;
 }
 
 export function InputField({ 
@@ -50,15 +55,26 @@ export function InputField({
   required, 
   error, 
   register, 
-  className = "" 
+  className = "",
+  value,
+  onChange,
+  min,
+  max
 }: InputFieldProps) {
+  const isControlled = value !== undefined && onChange !== undefined;
+  
   return (
     <FormField label={label} htmlFor={id} error={error} required={required} className={className}>
       <Input
         id={id}
         type={type}
         placeholder={placeholder}
-        {...(register ? register(id.split('-').pop()) : {})}
+        min={min}
+        max={max}
+        {...(isControlled 
+          ? { value, onChange } 
+          : (register ? register(id.split('-').pop()) : {})
+        )}
       />
     </FormField>
   );

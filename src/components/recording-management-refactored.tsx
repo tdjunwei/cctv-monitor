@@ -17,11 +17,9 @@ import {
 import { Camera, Recording } from '@/types/cctv';
 import { 
   formatTimeAgo, 
-  formatDateTime, 
   formatTime, 
   formatDurationString,
   formatFileSize,
-  filterRecordingsByDateRange,
   filterRecordingsBySearch,
   sortRecordingsByDate,
   getRecordingsByCamera,
