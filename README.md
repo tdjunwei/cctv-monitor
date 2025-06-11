@@ -65,26 +65,57 @@ A modern, responsive home CCTV monitoring system built with Next.js, TypeScript,
 ### Installation
 
 1. Clone the repository
-\`\`\`bash
+```bash
 git clone https://github.com/tdjunwei/cctv-monitor.git
 cd cctv-monitor
-\`\`\`
+```
 
 2. Install dependencies
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
-3. Run the development server
-\`\`\`bash
+3. Configure environment variables
+```bash
+cp .env.example .env.local
+# Edit .env.local with your configuration
+```
+
+4. Run the development server
+```bash
 npm run dev
-\`\`\`
+```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Configuration
+
+### Environment Variables
+
+The application can be configured using environment variables. Copy `.env.example` to `.env.local` and customize:
+
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+
+# Application Metadata
+NEXT_PUBLIC_APP_NAME=CCTV Monitor
+NEXT_PUBLIC_APP_VERSION=1.0.0
+```
+
+#### Environment Variables Reference
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `NEXT_PUBLIC_API_URL` | Backend API server URL | `http://localhost:3001/api` | Yes |
+| `NEXT_PUBLIC_APP_NAME` | Application display name | `CCTV Monitor` | No |
+| `NEXT_PUBLIC_APP_VERSION` | Application version | `1.0.0` | No |
+
+**Note**: Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. Use this prefix for client-side configuration only.
 
 ## Project Structure
 
-\`\`\`
+```
 src/
 ├── app/                    # Next.js app directory
 │   ├── globals.css        # Global styles
@@ -102,7 +133,7 @@ src/
 │   └── utils.ts           # Utility functions
 └── types/
     └── cctv.ts            # TypeScript interfaces
-\`\`\`
+```
 
 ## Key Components
 
@@ -146,8 +177,8 @@ src/
 
 ### Adding New Features
 
-1. Create components in \`src/components/\`
-2. Define TypeScript interfaces in \`src/types/\`
+1. Create components in `src/components/`
+2. Define TypeScript interfaces in `src/types/`
 3. Use Shadcn/ui components for consistent styling
 4. Implement form validation with react-hook-form and Zod
 
@@ -155,12 +186,12 @@ src/
 
 All forms use react-hook-form with Zod schemas for validation:
 
-\`\`\`typescript
+```typescript
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email'),
 });
-\`\`\`
+```
 
 ### Styling
 
@@ -184,31 +215,14 @@ To test mobile responsiveness:
 - Alert cards and action buttons
 - Settings panel with responsive controls
 
-## Configuration
-
-### Environment Variables
-
-Create a \`.env.local\` file for configuration:
-
-\`\`\`
-NEXT_PUBLIC_API_URL=http://localhost:3001
-DATABASE_URL=your_database_url
-\`\`\`
-
-### Customization
-
-- Modify \`tailwind.config.ts\` for theme customization
-- Update \`src/types/cctv.ts\` for data model changes
-- Customize components in \`src/components/ui/\`
-
 ## Deployment
 
 ### Build for Production
 
-\`\`\`bash
+```bash
 npm run build
 npm start
-\`\`\`
+```
 
 ### Deploy to Vercel
 

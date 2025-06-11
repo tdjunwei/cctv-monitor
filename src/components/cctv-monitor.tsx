@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,6 +19,7 @@ import { CameraManagement } from '@/components/camera-management';
 import { RecordingManagement } from '@/components/recording-management';
 import { AlertsPanel } from '@/components/alerts-panel';
 import { SettingsPanel } from '@/components/settings-panel';
+import { DatabaseAPI } from '@/lib/database-client';
 
 // Mock data for demonstration  
 const mockCameras: CameraType[] = [
@@ -110,30 +111,143 @@ const mockStats: DashboardStats = {
 
 export default function CCTVMonitor() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [cameras, setCameras] = useState<CameraType[]>(mockCameras);
-  const [alerts, setAlerts] = useState<Alert[]>(mockAlerts);
-  const [stats] = useState<DashboardStats>(mockStats);
+  const [cameras, setCameras] = useState<CameraType[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [stats, setStats] = useState<DashboardStats>(mockStats);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCameraUpdate = (updatedCamera: CameraType) => {
-    setCameras(cameras.map(cam => 
-      cam.id === updatedCamera.id ? updatedCamera : cam
-    ));
+  // Load data from API
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Load cameras and alerts from API
+      const [camerasData, alertsData] = await Promise.all([
+        DatabaseAPI.getCameras(),
+        DatabaseAPI.getAlerts()
+      ]);
+      
+      setCameras(camerasData);
+      setAlerts(alertsData);
+      
+      // Calculate stats from real data
+      const onlineCameras = camerasData.filter(cam => cam.isOnline).length;
+      const offlineCameras = camerasData.length - onlineCameras;
+      const unreadAlerts = alertsData.filter(alert => !alert.isRead).length;
+      const lastMotionDetected = camerasData
+        .filter(cam => cam.lastMotionDetected)
+        .sort((a, b) => (b.lastMotionDetected?.getTime() || 0) - (a.lastMotionDetected?.getTime() || 0))[0]?.lastMotionDetected;
+      
+      setStats({
+        totalCameras: camerasData.length,
+        onlineCameras,
+        offlineCameras,
+        totalRecordings: 156, // TODO: Load from recordings API
+        storageUsed: 45.2, // TODO: Load from dashboard API
+        storageTotal: 500, // TODO: Load from dashboard API
+        unreadAlerts,
+        lastMotionDetected: lastMotionDetected || new Date()
+      });
+      
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+      // Fallback to mock data if API fails
+      setCameras(mockCameras);
+      setAlerts(mockAlerts);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCameraDelete = (cameraId: string) => {
-    setCameras(cameras.filter(cam => cam.id !== cameraId));
+  const handleCameraUpdate = async (updatedCamera: CameraType) => {
+    try {
+      // Update camera via API
+      await DatabaseAPI.updateCamera(updatedCamera.id, updatedCamera);
+      // Update local state
+      setCameras(cameras.map(cam => 
+        cam.id === updatedCamera.id ? updatedCamera : cam
+      ));
+      // Reload data to get updated stats
+      loadData();
+    } catch (err) {
+      console.error('Error updating camera:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update camera');
+    }
   };
 
-  const handleAlertRead = (alertId: string) => {
-    setAlerts(alerts.map(alert =>
-      alert.id === alertId ? { ...alert, isRead: true } : alert
-    ));
+  const handleCameraDelete = async (cameraId: string) => {
+    try {
+      // Delete camera via API
+      await DatabaseAPI.deleteCamera(cameraId);
+      // Update local state
+      setCameras(cameras.filter(cam => cam.id !== cameraId));
+      // Reload data to get updated stats
+      loadData();
+    } catch (err) {
+      console.error('Error deleting camera:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete camera');
+    }
+  };
+
+  const handleAlertRead = async (alertId: string) => {
+    try {
+      // Mark alert as read via API
+      await DatabaseAPI.markAlertAsRead(alertId);
+      // Update local state
+      setAlerts(alerts.map(alert =>
+        alert.id === alertId ? { ...alert, isRead: true } : alert
+      ));
+      // Update stats
+      const unreadCount = alerts.filter(alert => alert.id !== alertId && !alert.isRead).length;
+      setStats(prevStats => ({ ...prevStats, unreadAlerts: unreadCount }));
+    } catch (err) {
+      console.error('Error marking alert as read:', err);
+      setError(err instanceof Error ? err.message : 'Failed to mark alert as read');
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
+              <span className="text-sm text-red-800">{error}</span>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-800"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading CCTV Monitor...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      {!loading && (
+        <>
+          {/* Header */}
+          <header className="bg-white shadow-sm border-b">
         <div className="px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -277,6 +391,8 @@ export default function CCTVMonitor() {
           </TabsContent>
         </Tabs>
       </main>
+        </>
+      )}
     </div>
   );
 }

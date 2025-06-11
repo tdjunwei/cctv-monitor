@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Camera } from '@/types/cctv';
 import { formatDistanceToNow } from 'date-fns';
+import { DatabaseAPI } from '@/lib/database-client';
 
 const cameraSchema = z.object({
   name: z.string().min(1, 'Camera name is required'),
@@ -61,29 +62,25 @@ function CameraManagement({ cameras, onCameraUpdate, onCameraDelete }: CameraMan
   const onSubmit = async (data: CameraFormData) => {
     try {
       if (editingCamera) {
-        // Update existing camera
-        const updatedCamera: Camera = {
-          ...editingCamera,
+        // Update existing camera via API
+        const updatedCamera = await DatabaseAPI.updateCamera(editingCamera.id, {
           ...data,
           updatedAt: new Date()
-        };
+        });
         onCameraUpdate(updatedCamera);
         setEditingCamera(null);
       } else {
-        // Add new camera
-        const newCamera: Camera = {
-          id: Date.now().toString(),
-          ...data,
-          isOnline: true, // Assume new cameras are online
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
+        // Create new camera via API
+        const newCamera = await DatabaseAPI.createCamera({
+          ...data
+        });
         onCameraUpdate(newCamera);
         setIsAddDialogOpen(false);
       }
       reset();
     } catch (error) {
       console.error('Error saving camera:', error);
+      // TODO: Show error message to user
     }
   };
 
